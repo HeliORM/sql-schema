@@ -338,6 +338,12 @@ public final class MysqlModeller extends SqlModeller {
                 return true;
             }
         }
+        else if (one instanceof BinaryColumn bin1) {
+            if (other instanceof BinaryColumn bin2) {
+                return actualLength(bin1) == actualLength(bin2);
+            }
+            return false;
+        }
         return one.getJdbcType() == other.getJdbcType();
     }
 

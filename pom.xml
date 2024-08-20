@@ -8,7 +8,7 @@
     <artifactId>sql-schema</artifactId>
     <name>SQL Schema Library</name>
     <description>A library to live maintain SQL schemas based on code</description>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>

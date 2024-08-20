@@ -460,6 +460,18 @@ public abstract class SqlModeller {
         return length;
     }
 
+    protected final int actualLength(BinaryColumn column) {
+        var length = column.getLength();
+        if (length > 16777215) {
+            return 2147483647;
+        } else if (length > 65535) {
+            return 16777215;
+        } else if (length > 255) {
+            return 65535;
+        }
+        return length;
+    }
+
     /**
      * Generate a query to modify a column in a table.
      *
