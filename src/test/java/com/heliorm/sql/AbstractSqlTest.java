@@ -17,24 +17,30 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 class AbstractSqlTest {
-
+    private static final String DB = "test";
     private static DataSource jdbcDataSource;
     protected static SqlModeller modeller;
     protected static SqlVerifier verifier;
-    protected static TestDatabase db = new TestDatabase("neutral");
+    protected static TestDatabase db = new TestDatabase(DB);
     protected static TestTable table = new TestTable(db, "Person");
 
     @Container
-    public static GenericContainer mariadb = new GenericContainer(DockerImageName.parse("mariadb")).withExposedPorts(3306).withEnv("MYSQL_DATABASE", "neutral").withEnv("MYSQL_ROOT_PASSWORD", "dev");
+    public static GenericContainer mariadb = new GenericContainer(DockerImageName.parse("mariadb"))
+            .withExposedPorts(3306)
+            .withEnv("MYSQL_DATABASE", DB)
+            .withEnv("MYSQL_ROOT_PASSWORD", "dev");
 
     @Container
-    public static GenericContainer postgres = new GenericContainer(DockerImageName.parse("postgres")).withExposedPorts(5432).withEnv("POSTGRES_DB", "neutral").withEnv("POSTGRES_PASSWORD", "dev");
+    public static GenericContainer postgres = new GenericContainer(DockerImageName.parse("postgres"))
+            .withExposedPorts(5432)
+            .withEnv("POSTGRES_DB", DB)
+            .withEnv("POSTGRES_PASSWORD", "dev");
 
 
     @BeforeAll
     public static void setup() {
         String dbType = System.getenv("TEST_DB");
-        dbType = (dbType == null) ? "" : dbType;
+        dbType = (dbType == null) ? "mysql" : dbType;
         switch (dbType) {
             case "postgresql":
                 jdbcDataSource = setupPostgreSqlDatasource();
@@ -71,7 +77,7 @@ class AbstractSqlTest {
     private static DataSource setupMysqlDataSource() {
         mariadb.start();
         HikariConfig conf = new HikariConfig();
-        conf.setJdbcUrl(format("jdbc:mysql://%s:%d/neutral", mariadb.getHost(), mariadb.getFirstMappedPort()));
+        conf.setJdbcUrl(format("jdbc:mysql://%s:%d/" +DB, mariadb.getHost(), mariadb.getFirstMappedPort()));
         conf.setUsername("root");
         conf.setPassword("dev");
         return new HikariDataSource(conf);
@@ -81,7 +87,7 @@ class AbstractSqlTest {
     private static DataSource setupPostgreSqlDatasource() {
         postgres.start();
         HikariConfig conf = new HikariConfig();
-        conf.setJdbcUrl(format("jdbc:postgresql://%s:%d/neutral", postgres.getHost(), postgres.getFirstMappedPort()));
+        conf.setJdbcUrl(format("jdbc:postgresql://%s:%d/" + DB, postgres.getHost(), postgres.getFirstMappedPort()));
         conf.setUsername("postgres");
         conf.setPassword("dev");
         return new HikariDataSource(conf);
