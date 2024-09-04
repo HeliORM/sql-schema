@@ -5,7 +5,8 @@ import java.sql.JDBCType;
 /** Abstraction representing a SQL table column
  *
  */
-public interface Column {
+public sealed interface Column permits BinaryColumn, BitColumn, BooleanColumn, DateTimeColumn, DecimalColumn,
+        DoubleColumn, EnumColumn, IntegerColumn, SetColumn, StringColumn, TimeStampColumn {
 
     /** Return the name of the column.
      *

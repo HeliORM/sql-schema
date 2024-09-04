@@ -1,6 +1,6 @@
 package com.heliorm.sql;
 
-public interface BinaryColumn extends Column {
+public non-sealed interface BinaryColumn extends Column {
 
     /**
      * Return the length of the binary column.

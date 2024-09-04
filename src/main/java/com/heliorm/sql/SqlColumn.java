@@ -6,7 +6,7 @@ import java.sql.JDBCType;
 /** Implementation of a column that is populated by reading from SQL
  *
  */
-abstract class SqlColumn implements Column {
+abstract class SqlColumn  {
 
     private final Table table;
     private final String name;
@@ -30,37 +30,37 @@ abstract class SqlColumn implements Column {
         this.key = key;
     }
 
-    @Override
+    
     public Table getTable() {
         return table;
     }
 
-    @Override
+    
     public String getName() {
         return name;
     }
 
-    @Override
+    
     public JDBCType getJdbcType() {
         return jdbcType;
     }
 
-    @Override
+    
     public boolean isNullable() {
         return nullable;
     }
 
-    @Override
+    
     public boolean isKey() {
         return key;
     }
 
-    @Override
+    
     public boolean isAutoIncrement() {
         return autoIncrement;
     }
 
-    @Override
+    
     public String getDefault() {
         return defaultValue;
     }
@@ -69,7 +69,7 @@ abstract class SqlColumn implements Column {
         this.nullable = nullable;
     }
     
-    @Override
+    
     public String toString() {
         return "SqlColumn{" +
                 "autoIncrement=" + autoIncrement +

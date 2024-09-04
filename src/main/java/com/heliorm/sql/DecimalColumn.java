@@ -1,7 +1,7 @@
 package com.heliorm.sql;
 
 /** Column representing a decimal number */
-public interface DecimalColumn extends Column {
+public non-sealed interface DecimalColumn extends Column {
 
     /** Get the precision of the number.
      *

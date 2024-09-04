@@ -1,6 +1,6 @@
 package com.heliorm.sql;
 
 /** Column representing a double number */
-public interface DoubleColumn extends Column {
+public non-sealed interface DoubleColumn extends Column {
 
 }
