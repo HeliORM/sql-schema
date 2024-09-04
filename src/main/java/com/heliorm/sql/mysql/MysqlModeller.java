@@ -37,7 +37,8 @@ import static java.lang.String.format;
  * An implementation of the SQL modeller that deals with MySQL/MariaDB syntax.
  */
 public final class MysqlModeller extends SqlModeller {
-    private final boolean  anonymousDb;
+    private final boolean anonymousDb;
+
     /**
      * Create a new modeller with the given connection supplier.
      *
@@ -155,7 +156,7 @@ public final class MysqlModeller extends SqlModeller {
             type.append(" NOT NULL");
         }
         if ((column.getDefault() != null) && !column.isAutoIncrement()) {
-            type.append(" DEFAULT " + switch (column) {
+            type.append(" DEFAULT ").append(switch (column) {
                 case StringColumn sc -> "'" + sc.getDefault() + "'";
                 case EnumColumn ec -> "'" + ec.getDefault() + "'";
                 default -> column.getDefault();
@@ -243,7 +244,7 @@ public final class MysqlModeller extends SqlModeller {
     }
 
     @Override
-    protected List<String> makeModifyColumnQuery(Column current, Column changed) throws SqlModellerException {
+    protected List<String> makeModifyColumnQuery(Column current, Column changed) {
         var res = new ArrayList<String>();
         if (current.isKey()) {
             res.add(format("ALTER TABLE %s MODIFY COLUMN %s %s",
@@ -255,7 +256,7 @@ public final class MysqlModeller extends SqlModeller {
                 getTableName(changed.getTable()),
                 getColumnName(changed),
                 getCreateType(changed)));
-        return  res;
+        return res;
     }
 
     @Override
@@ -332,13 +333,11 @@ public final class MysqlModeller extends SqlModeller {
             if (other instanceof DateTimeColumn) {
                 return true;
             }
-        }
-        else if (one instanceof DoubleColumn) {
+        } else if (one instanceof DoubleColumn) {
             if (other instanceof DoubleColumn) {
                 return true;
             }
-        }
-        else if (one instanceof BinaryColumn bin1) {
+        } else if (one instanceof BinaryColumn bin1) {
             if (other instanceof BinaryColumn bin2) {
                 return actualLength(bin1) == actualLength(bin2);
             }

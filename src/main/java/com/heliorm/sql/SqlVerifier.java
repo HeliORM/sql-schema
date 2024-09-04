@@ -58,12 +58,12 @@ public final class SqlVerifier {
         List<Action> actions = new ArrayList<>();
         for (var name : tableColumns.keySet()) {
             var tableColumn = tableColumns.get(name);
-            if (!sqlColumns.keySet().stream().anyMatch(key -> key.equalsIgnoreCase(name))) {
+            if (sqlColumns.keySet().stream().noneMatch(key -> key.equalsIgnoreCase(name))) {
                 modeller.addColumn(tableColumn);
                 actions.add(Action.addColumn(tableColumn));
             } else {
                 var opt = sqlColumns.keySet().stream().filter(key -> key.equalsIgnoreCase(name))
-                        .map(n -> sqlColumns.get(n)).findFirst();
+                        .map(sqlColumns::get).findFirst();
                 if (opt.isPresent()) {
                     var sqlColumn = opt.get();
                     if (!sqlColumn.getName().equals(tableColumn.getName())) {
