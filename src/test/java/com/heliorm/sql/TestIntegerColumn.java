@@ -5,12 +5,12 @@ import java.util.Collections;
 
 public class TestIntegerColumn extends TestColumn implements IntegerColumn{
 
-    public TestIntegerColumn(Table table, String name, JDBCType jdbcType) {
-        super(table, name, jdbcType);
+    public TestIntegerColumn(Table table, String name) {
+        super(table, name, JDBCType.INTEGER);
     }
 
-    public TestIntegerColumn(Table table, String name, JDBCType jdbcType, boolean nullable, boolean key, boolean autoIncrement) {
-        super(table, name, jdbcType, nullable,  null, key, autoIncrement, Collections.emptySet());
+    public TestIntegerColumn(Table table, String name, boolean nullable, boolean key, boolean autoIncrement, String defaultValue) {
+        super(table, name, JDBCType.INTEGER, nullable,  defaultValue, key, autoIncrement, Collections.emptySet());
     }
 
     public TestIntegerColumn(Table table, String name, JDBCType jdbcType, boolean nullable, String defaultValue, boolean key) {

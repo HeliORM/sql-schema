@@ -17,8 +17,8 @@ public class TestStringColumn extends TestColumn implements StringColumn {
         this.length = length;
     }
 
-    public TestStringColumn(Table table, String name, JDBCType jdbcType, boolean nullable, String defaultValue, boolean key, boolean autoIncrement, int length) {
-        super(table, name, jdbcType, nullable, defaultValue, key, autoIncrement, Collections.emptySet());
+    public TestStringColumn(Table table, String name, boolean nullable,  boolean key, boolean autoIncrement, int length, String defaultValue) {
+        super(table, name, JDBCType.VARCHAR, nullable, defaultValue, key, autoIncrement, Collections.emptySet());
         this.length = length;
     }
 

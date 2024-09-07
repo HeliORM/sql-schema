@@ -21,14 +21,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-final class Compare {
+public final class Compare {
 
-    static List<Action> compare(Table have, Table want) {
+    public static List<Action> compare(Table have, Table want) {
         var res = new ArrayList<Action>();
         var haveColumns = columnNames(have);
         var wantColumns = columnNames(want);
-        var bothColumns = new HashSet<>(haveColumns);
-        bothColumns.addAll(wantColumns);
+        var bothColumns = Stream.concat(haveColumns.stream().filter(wantColumns::contains),
+        wantColumns.stream().filter(haveColumns::contains)).collect(Collectors.toSet());
         for (var name : haveColumns) {
             if (want.getColumn(name) == null) {
                 res.add(new RemoveColumn(have.getColumn(name)));
@@ -259,10 +259,21 @@ final class Compare {
     }
 
     private static List<Action> compareDefault(Column have, Column want) {
-        if (!have.getDefault().equals(want.getDefault())) {
-            return List.of( new ChangeDefault(want));
+        if (have.getDefault() == null) {
+            if (want.getDefault() == null) {
+                return List.of();
+            }
+            else {
+                return List.of(new AddDefault(want));
+            }
         }
-        return List.of();
+        if (want.getDefault() == null) {
+            return List.of( new RemoveDefault(want));
+        }
+        if (want.getDefault().equals(have.getDefault())) {
+            return List.of();
+        }
+        return List.of(new ChangeDefault(want));
     }
 
     private static int actualTextLength(StringColumn column) {
