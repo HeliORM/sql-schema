@@ -2,7 +2,7 @@ package com.heliorm.sql;
 
 import java.sql.JDBCType;
 
-public class TestBitColumn extends TestColumn implements BitColumn{
+public final class TestBitColumn extends TestColumn implements BitColumn{
 
     private final int bits;
 

@@ -2,7 +2,7 @@ package com.heliorm.sql;
 
 import java.sql.JDBCType;
 
-public class TestDecimalColumn extends TestColumn implements DecimalColumn{
+public final class TestDecimalColumn extends TestColumn implements DecimalColumn{
     private final int precision;
     private final  int scale;
 
