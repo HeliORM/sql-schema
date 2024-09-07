@@ -7,6 +7,7 @@ Feature: Add a column to a table
     When columns are added
       | name | type        |
       | name | varchar(50) |
+      | age  | integer     |
     Then the table must have these columns
       | name | type        |
       | id   | integer     |
