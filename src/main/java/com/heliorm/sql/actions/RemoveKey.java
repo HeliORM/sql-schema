@@ -1,4 +1,4 @@
-package com.heliorm.sql.differences;
+package com.heliorm.sql.actions;
 
 import com.heliorm.sql.Column;
 

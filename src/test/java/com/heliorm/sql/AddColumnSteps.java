@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.heliorm.sql.differences.Compare.compare;
+import static com.heliorm.sql.diffs.Compare.compare;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -77,6 +77,7 @@ public class AddColumnSteps extends AbstractSqlTest implements En {
         return switch (type) {
             case "integer" -> new TestIntegerColumn(table, name, nullable, key, autoInc, def.isEmpty() ? null : def);
             case "double" -> new TestDoubleColumn(table, name, nullable, key, autoInc, def.isEmpty() ? null : def);
+            case "boolean" -> new TestBooleanColumn(table, name, def.isEmpty() ? null : def);
             default -> {
                 if (type.startsWith("varchar(")) {
                     var len = Integer.parseInt(type.split("\\(")[1].split("\\)")[0]);

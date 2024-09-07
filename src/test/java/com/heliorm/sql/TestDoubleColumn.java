@@ -3,7 +3,7 @@ package com.heliorm.sql;
 import java.sql.JDBCType;
 import java.util.Collections;
 
-public class TestDoubleColumn extends TestColumn implements IntegerColumn{
+public class TestDoubleColumn extends TestColumn implements DoubleColumn{
 
     public TestDoubleColumn(Table table, String name) {
         super(table, name, JDBCType.DOUBLE);
