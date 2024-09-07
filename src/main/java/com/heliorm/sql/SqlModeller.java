@@ -84,7 +84,7 @@ public abstract class SqlModeller {
         try (var con = con()) {
             var dbm = con.getMetaData();
             var table = new SqlTable(database, name);
-            var sqlColumns = new HashMap<String, SqlColumn>();
+            var sqlColumns = new HashMap<String, Column>();
             try (var columns = dbm.getColumns(database.getName(), null, table.getName(), "%")) {
                 while (columns.next()) {
                     var column = getColumnFromResultSet(table, columns);
@@ -100,7 +100,9 @@ public abstract class SqlModeller {
                         throw new SqlModellerException(format("Cannot find column '%s' in table '%s' yet it is a primary key", keys.getString("COLUMN_NAME"), table.getName()));
                     }
                     keyNames.add(pkName);
-                    column.setKey(true);
+                    if (column instanceof SqlColumn sqlColumn) {
+                        sqlColumn.setKey(true);
+                    }
                 }
             }
             for (var column : sqlColumns.values()) {
@@ -630,7 +632,7 @@ public abstract class SqlModeller {
      * @param rs    The result set
      * @return The column mode
      */
-    private SqlColumn getColumnFromResultSet(Table table, ResultSet rs) throws SqlModellerException {
+    private Column getColumnFromResultSet(Table table, ResultSet rs) throws SqlModellerException {
         try {
             var jdbcType = JDBCType.valueOf(rs.getInt("DATA_TYPE"));
             var size = rs.getInt("COLUMN_SIZE");

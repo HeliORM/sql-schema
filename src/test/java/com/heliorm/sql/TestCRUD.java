@@ -19,7 +19,7 @@ public class TestCRUD extends AbstractSqlTest {
     @Test
     @Order(31)
     public void modifyDecimalColumn() throws SqlModellerException {
-        TestColumn amount = new TestDecimalColumn(table, "amount", 18, 5);
+         var amount = new TestDecimalColumn(table, "amount", 18, 5);
         table.addColumn(amount);
         modeller.modifyColumn(amount);
         Table loaded = modeller.readTable(db, "Person");
@@ -29,7 +29,7 @@ public class TestCRUD extends AbstractSqlTest {
     @Test
     @Order(33)
     public void changeStringColumnDefault() throws SqlModellerException {
-        TestColumn surname = new TestStringColumn(table, "surname", JDBCType.LONGVARCHAR, false, "Smith", false, false, 30);
+        var surname = new TestStringColumn(table, "surname", JDBCType.LONGVARCHAR, false, "Smith", false, false, 30);
         table.addColumn(surname);
         modeller.modifyColumn(surname);
         Table loaded = modeller.readTable(db, "Person");
@@ -39,7 +39,7 @@ public class TestCRUD extends AbstractSqlTest {
     @Test
     @Order(34)
     public void addIntegerColumnWithDefault() throws SqlModellerException {
-        TestColumn len = new TestIntegerColumn(table, "length", JDBCType.BIGINT, false, "0", false);
+        var len = new TestIntegerColumn(table, "length", JDBCType.BIGINT, false, "0", false);
         table.addColumn(len);
         modeller.addColumn(len);
         Table loaded = modeller.readTable(db, "Person");
@@ -49,7 +49,7 @@ public class TestCRUD extends AbstractSqlTest {
     @Test
     @Order(40)
     public void addEnumColumn() throws SqlModellerException {
-        TestColumn type = new TestEnumColumn(table, "type", true, new HashSet<>(Arrays.asList("APE", "BEAST")));
+        var type = new TestEnumColumn(table, "type", true, new HashSet<>(Arrays.asList("APE", "BEAST")));
         table.addColumn(type);
         modeller.addColumn(type);
         Table loaded = modeller.readTable(db, "Person");
@@ -59,7 +59,7 @@ public class TestCRUD extends AbstractSqlTest {
     @Test
     @Order(50)
     public void addEnumValue() throws SqlModellerException {
-        TestColumn type = new TestEnumColumn(table, "type", true, new HashSet<>(Arrays.asList("APE", "BEAST", "COW")));
+        var type = new TestEnumColumn(table, "type", true, new HashSet<>(Arrays.asList("APE", "BEAST", "COW")));
         table.addColumn(type);
         modeller.modifyColumn(type);
         Table loaded = modeller.readTable(db, "Person");
@@ -69,7 +69,7 @@ public class TestCRUD extends AbstractSqlTest {
     @Test
     @Order(60)
     public void removeEnumValue() throws SqlModellerException {
-        TestColumn type = new TestEnumColumn(table, "type", true, new HashSet<>(Arrays.asList("APE", "COW")));
+        var type = new TestEnumColumn(table, "type", true, new HashSet<>(Arrays.asList("APE", "COW")));
         table.addColumn(type);
         modeller.modifyColumn(type);
         Table loaded = modeller.readTable(db, "Person");
@@ -80,7 +80,7 @@ public class TestCRUD extends AbstractSqlTest {
     @Test
     @Order(61)
     public void addSetColumn() throws SqlModellerException {
-        TestColumn col = new TestSetColumn(table, "selection", true, new HashSet<>(Arrays.asList("BREAKFAST", "LUNCH", "DINNER")));
+        var col = new TestSetColumn(table, "selection", true, new HashSet<>(Arrays.asList("BREAKFAST", "LUNCH", "DINNER")));
         if (modeller.supportsSet()) {
             table.addColumn(col);
             modeller.addColumn(col);
@@ -94,7 +94,7 @@ public class TestCRUD extends AbstractSqlTest {
     @Test
     @Order(62)
     public void addSetValue() throws SqlModellerException {
-        TestColumn col = new TestSetColumn(table, "selection", true, new HashSet<>(Arrays.asList("BREAKFAST", "2ND BREAKFAST", "LUNCH", "DINNER")));
+        var col = new TestSetColumn(table, "selection", true, new HashSet<>(Arrays.asList("BREAKFAST", "2ND BREAKFAST", "LUNCH", "DINNER")));
         if (modeller.supportsSet()) {
             table.addColumn(col);
             modeller.modifyColumn(col);
@@ -108,7 +108,7 @@ public class TestCRUD extends AbstractSqlTest {
     @Test
     @Order(63)
     public void removeSetValue() throws SqlModellerException {
-        TestColumn col = new TestEnumColumn(table, "selection", true, new HashSet<>(Arrays.asList("BREAKFAST", "LUNCH", "DINNER")));
+        var col = new TestEnumColumn(table, "selection", true, new HashSet<>(Arrays.asList("BREAKFAST", "LUNCH", "DINNER")));
         if (modeller.supportsSet()) {
             table.addColumn(col);
             modeller.modifyColumn(col);
@@ -122,8 +122,8 @@ public class TestCRUD extends AbstractSqlTest {
     @Test
     @Order(70)
     public void deleteColumn() throws SqlModellerException {
-        TestColumn email = new TestStringColumn(table, "email", JDBCType.VARCHAR, 128);
-        TestColumn notes = new TestStringColumn(table, "notes", JDBCType.LONGVARCHAR, 1000);
+        var email = new TestStringColumn(table, "email", JDBCType.VARCHAR, 128);
+        var notes = new TestStringColumn(table, "notes", JDBCType.LONGVARCHAR, 1000);
         table.deleteColumn(email);
         table.deleteColumn(notes);
         modeller.deleteColumn(email);
@@ -135,7 +135,7 @@ public class TestCRUD extends AbstractSqlTest {
     @Test
     @Order(80)
     public void modifyColumnLength() throws SqlModellerException {
-        TestColumn name = new TestStringColumn(table, "fullName", JDBCType.VARCHAR, true, false, 64);
+        var name = new TestStringColumn(table, "fullName", JDBCType.VARCHAR, true, false, 64);
         table.addColumn(name);
         modeller.modifyColumn(name);
         Table loaded = modeller.readTable(db, "Person");
@@ -145,7 +145,7 @@ public class TestCRUD extends AbstractSqlTest {
     @Test
     @Order(90)
     public void modifyColumnTypeSmallIntBigInt() throws SqlModellerException {
-        TestColumn age = new TestIntegerColumn(table, "age", JDBCType.BIGINT, false, false, false);
+        var age = new TestIntegerColumn(table, "age", JDBCType.BIGINT, false, false, false);
         table.addColumn(age);
         Table loaded = modeller.readTable(db, "Person");
         assertFalse(isSameTable(loaded, table), "Table we modified must not be the same as the one loaded");
@@ -157,7 +157,7 @@ public class TestCRUD extends AbstractSqlTest {
     @Test
     @Order(100)
     public void modifyColumnType() throws SqlModellerException {
-        TestColumn sex = new TestBooleanColumn(table, "sex");
+        var sex = new TestBooleanColumn(table, "sex");
         table.addColumn(sex);
         modeller.modifyColumn(sex);
         Table loaded = modeller.readTable(db, "Person");
