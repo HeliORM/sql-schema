@@ -148,6 +148,8 @@ public final class MysqlModeller extends SqlModeller {
             case DateTimeColumn ignored -> typeName = "DATETIME";
             case TimeStampColumn ignored -> typeName = "TIMESTAMP";
             case DoubleColumn ignored -> typeName = "DOUBLE";
+            case BooleanColumn ignored -> typeName = "BOOLEAN";
+            case BitColumn bitColumn -> typeName = format("BIT(%d)", bitColumn.bits());
             default -> {
             }
         }
