@@ -108,7 +108,9 @@ class AbstractSqlTest {
     }
 
     protected boolean isSameTable(Table one, TestTable other) {
-        return one.getDatabase().name().equals(other.getDatabase().name()) && isSameColumns(one.getColumns(), other.getColumns()) && isSameIndexes(one.getIndexes(), other.getIndexes());
+        return one.getDatabase().name().equals(other.getDatabase().name())
+                && isSameColumns(one.getColumns(), other.getColumns())
+                && isSameIndexes(one.getIndexes(), other.getIndexes());
     }
 
     protected boolean isSameColumns(Set<Column> one, Set<Column> other) {
@@ -116,9 +118,9 @@ class AbstractSqlTest {
             say("Columns: one.size %d != other.size %d", one.size(), other.size());
             return false;
         }
-        Map<String, Column> oneMap = one.stream().collect(Collectors.toMap(Column::name, col -> col));
-        Map<String, Column> otherMap = other.stream().collect(Collectors.toMap(Column::name, col -> col));
-        for (String name : oneMap.keySet()) {
+        var oneMap = one.stream().collect(Collectors.toMap(Column::name, col -> col));
+        var otherMap = other.stream().collect(Collectors.toMap(Column::name, col -> col));
+        for (var name : oneMap.keySet()) {
             if (!otherMap.containsKey(name)) {
                 say("other doesn't have %s", name);
                 return false;
@@ -157,7 +159,14 @@ class AbstractSqlTest {
     }
 
     protected boolean isSameColumn(Column one, Column other) {
-        boolean same = one.autoIncrement() == other.autoIncrement() && one.nullable() == other.nullable() && one.key() == other.key() && one.name().equals(other.name()) && ((one.defaultValue() != null && other.defaultValue() != null && one.defaultValue().equals(other.defaultValue())) || (one.defaultValue() == null && other.defaultValue() == null)) && modeller.typesAreCompatible(one, other);
+        boolean same = one.autoIncrement() == other.autoIncrement()
+                && one.nullable() == other.nullable()
+                && one.key() == other.key()
+                && one.name().equals(other.name())
+                && ((one.defaultValue() != null
+                && other.defaultValue() != null
+                && one.defaultValue().equals(other.defaultValue())) || (one.defaultValue() == null && other.defaultValue() == null))
+                && modeller.typesAreCompatible(one, other);
         if (!same) {
             say("one %s\n\tvs\nother %s", one, other);
 

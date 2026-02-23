@@ -25,6 +25,16 @@ public final class TestCRUD extends AbstractSqlTest {
 
     @Test
     @Order(20)
+    public void addBinaryColumn() throws SqlModellerException {
+        var content = new TestBinaryColumn(table, "content", JDBCType.LONGVARBINARY, 1024*1024);
+        table.addColumn(content);
+        modeller.addColumn(content);
+        var loaded = modeller.readTable(db, "Person");
+        assertTrue(isSameTable(loaded, table), "Table we modified must be the same as the one loaded");
+
+    }
+    @Test
+    @Order(21)
     public void addDateTimeColumn() throws SqlModellerException {
         var created = new TestDateTimeColumn(table, "created", JDBCType.TIMESTAMP, false);
         table.addColumn(created);
@@ -33,15 +43,6 @@ public final class TestCRUD extends AbstractSqlTest {
         assertTrue(isSameTable(loaded, table), "Table we modified must be the same as the one loaded");
     }
 
-    @Test
-    @Order(21)
-    public void addBinaryColumn() throws SqlModellerException {
-        var content = new TestBinaryColumn(table, "content", JDBCType.LONGVARBINARY, 1024*1024);
-        table.addColumn(content);
-        modeller.addColumn(content);
-        var loaded = modeller.readTable(db, "Person");
-        assertTrue(isSameTable(loaded, table), "Table we modified must be the same as the one loaded");
-    }
 
     @Test
     @Order(22)

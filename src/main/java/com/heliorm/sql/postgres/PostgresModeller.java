@@ -263,7 +263,6 @@ public final class PostgresModeller extends SqlModeller {
         }
     }
 
-
     @Override
     protected String extractDefault(String text) {
         int idx = text.indexOf("::");

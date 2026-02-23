@@ -139,7 +139,7 @@ public final class SqlVerifier {
     }
 
     private boolean isSame(Index one, Index other) {
-        boolean same = one.name().equals(other.name())
+        var same = one.name().equals(other.name())
                 && (one.unique() == other.unique());
         if (same) {
             return isSame(one.columns(), other.columns());
@@ -151,9 +151,9 @@ public final class SqlVerifier {
         if (one.size() != other.size()) {
             return false;
         }
-        Map<String, Column> oneMap = one.stream().collect(Collectors.toMap(Column::name, col -> col));
-        Map<String, Column> otherMap = other.stream().collect(Collectors.toMap(Column::name, col -> col));
-        for (String name : oneMap.keySet()) {
+        var oneMap = one.stream().collect(Collectors.toMap(Column::name, col -> col));
+        var otherMap = other.stream().collect(Collectors.toMap(Column::name, col -> col));
+        for (var name : oneMap.keySet()) {
             if (!otherMap.containsKey(name)) {
                 return false;
             }
