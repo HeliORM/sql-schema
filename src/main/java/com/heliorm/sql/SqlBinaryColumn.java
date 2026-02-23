@@ -12,7 +12,7 @@ final class SqlBinaryColumn extends SqlColumn implements BinaryColumn {
     }
 
     @Override
-    public int getLength() {
+    public int length() {
         return length;
     }
 }

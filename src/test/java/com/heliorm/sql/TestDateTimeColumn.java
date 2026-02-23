@@ -2,7 +2,7 @@ package com.heliorm.sql;
 
 import java.sql.JDBCType;
 
-public class TestDateTimeColumn extends TestColumn implements DateTimeColumn{
+public final class TestDateTimeColumn extends TestColumn implements DateTimeColumn{
 
 
     public TestDateTimeColumn(Table table, String name, JDBCType jdbcType) {

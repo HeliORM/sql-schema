@@ -1,18 +1,18 @@
 package com.heliorm.sql;
 
 /** Column representing a decimal number */
-public interface DecimalColumn extends Column {
+public non-sealed interface DecimalColumn extends Column {
 
     /** Get the precision of the number.
      *
      * @return The precision
      */
-    int getPrecision();
+    int precision();
 
     /** Get the scale of the number.
      *
      * @return The scale
      */
-    int getScale();
+    int scale();
 
 }

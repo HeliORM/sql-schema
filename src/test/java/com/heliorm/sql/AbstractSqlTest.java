@@ -9,6 +9,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 
 import javax.sql.DataSource;
+import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +23,20 @@ class AbstractSqlTest {
     protected static SqlModeller modeller;
     protected static SqlVerifier verifier;
     protected static TestDatabase db = new TestDatabase(DB);
-    protected static TestTable table = new TestTable(db, "Person");
+    protected static TestTable table;
+
+    static {
+        table = new TestTable(db, "Person");
+        table.addColumn(new TestIntegerColumn(table, "id", JDBCType.INTEGER, false, true, true));
+        table.addColumn(new TestDecimalColumn(table, "amount", JDBCType.DECIMAL));
+        table.addColumn(new TestStringColumn(table, "surname", JDBCType.VARCHAR, 255));
+        table.addColumn(new TestStringColumn(table, "email", JDBCType.VARCHAR, 128));
+        table.addColumn(new TestStringColumn(table, "notes", JDBCType.LONGVARCHAR, 65535));
+        table.addColumn(new TestStringColumn(table, "fullName", JDBCType.VARCHAR, 255));
+        table.addColumn(new TestIntegerColumn(table, "age", JDBCType.SMALLINT));
+        table.addColumn(new TestIntegerColumn(table, "contact", JDBCType.SMALLINT));
+        db.tables().add(table);
+    }
 
     @Container
     public static GenericContainer mariadb = new GenericContainer(DockerImageName.parse("mariadb"))
@@ -77,7 +91,7 @@ class AbstractSqlTest {
     private static DataSource setupMysqlDataSource() {
         mariadb.start();
         HikariConfig conf = new HikariConfig();
-        conf.setJdbcUrl(format("jdbc:mysql://%s:%d/" +DB, mariadb.getHost(), mariadb.getFirstMappedPort()));
+        conf.setJdbcUrl(format("jdbc:mysql://%s:%d/" + DB, mariadb.getHost(), mariadb.getFirstMappedPort()));
         conf.setUsername("root");
         conf.setPassword("dev");
         return new HikariDataSource(conf);
@@ -94,7 +108,7 @@ class AbstractSqlTest {
     }
 
     protected boolean isSameTable(Table one, TestTable other) {
-        return one.getDatabase().getName().equals(other.getDatabase().getName()) && isSameColumns(one.getColumns(), other.getColumns()) && isSameIndexes(one.getIndexes(), other.getIndexes());
+        return one.getDatabase().name().equals(other.getDatabase().name()) && isSameColumns(one.getColumns(), other.getColumns()) && isSameIndexes(one.getIndexes(), other.getIndexes());
     }
 
     protected boolean isSameColumns(Set<Column> one, Set<Column> other) {
@@ -102,8 +116,8 @@ class AbstractSqlTest {
             say("Columns: one.size %d != other.size %d", one.size(), other.size());
             return false;
         }
-        Map<String, Column> oneMap = one.stream().collect(Collectors.toMap(Column::getName, col -> col));
-        Map<String, Column> otherMap = other.stream().collect(Collectors.toMap(Column::getName, col -> col));
+        Map<String, Column> oneMap = one.stream().collect(Collectors.toMap(Column::name, col -> col));
+        Map<String, Column> otherMap = other.stream().collect(Collectors.toMap(Column::name, col -> col));
         for (String name : oneMap.keySet()) {
             if (!otherMap.containsKey(name)) {
                 say("other doesn't have %s", name);
@@ -121,8 +135,8 @@ class AbstractSqlTest {
             say("Indexes: one.size %d != other.size %d", one.size(), other.size());
             return false;
         }
-        Map<String, Index> oneMap = one.stream().collect(Collectors.toMap(Index::getName, col -> col));
-        Map<String, Index> otherMap = other.stream().collect(Collectors.toMap(Index::getName, col -> col));
+        Map<String, Index> oneMap = one.stream().collect(Collectors.toMap(Index::name, col -> col));
+        Map<String, Index> otherMap = other.stream().collect(Collectors.toMap(Index::name, col -> col));
         for (String name : oneMap.keySet()) {
             if (!otherMap.containsKey(name)) {
                 return false;
@@ -135,15 +149,15 @@ class AbstractSqlTest {
     }
 
     protected boolean isSameIndex(Index one, Index other) {
-        boolean same = one.getName().equals(other.getName()) && (one.isUnique() == other.isUnique());
+        boolean same = one.name().equals(other.name()) && (one.unique() == other.unique());
         if (same) {
-            return isSameColumns(one.getColumns(), other.getColumns());
+            return isSameColumns(one.columns(), other.columns());
         }
         return false;
     }
 
     protected boolean isSameColumn(Column one, Column other) {
-        boolean same = one.isAutoIncrement() == other.isAutoIncrement() && one.isNullable() == other.isNullable() && one.isKey() == other.isKey() && one.getName().equals(other.getName()) && ((one.getDefault() != null && other.getDefault() != null && one.getDefault().equals(other.getDefault())) || (one.getDefault() == null && other.getDefault() == null)) && modeller.typesAreCompatible(one, other);
+        boolean same = one.autoIncrement() == other.autoIncrement() && one.nullable() == other.nullable() && one.key() == other.key() && one.name().equals(other.name()) && ((one.defaultValue() != null && other.defaultValue() != null && one.defaultValue().equals(other.defaultValue())) || (one.defaultValue() == null && other.defaultValue() == null)) && modeller.typesAreCompatible(one, other);
         if (!same) {
             say("one %s\n\tvs\nother %s", one, other);
 

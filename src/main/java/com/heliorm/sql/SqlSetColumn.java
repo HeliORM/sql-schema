@@ -15,7 +15,7 @@ final class SqlSetColumn extends SqlColumn implements SetColumn {
     }
 
     @Override
-    public Set<String> getSetValues() {
+    public Set<String> setValues() {
         return setValues;
     }
 }

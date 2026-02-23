@@ -20,19 +20,19 @@ class TestTable implements Table {
     }
 
     void addColumn(Column column) {
-        columns.put(column.getName(), column);
+        columns.put(column.name(), column);
     }
 
     void deleteColumn(Column column) {
-        columns.remove(column.getName());
+        columns.remove(column.name());
     }
 
     void addIndex(Index index) {
-        indexes.put(index.getName(), index);
+        indexes.put(index.name(), index);
     }
 
     void removeIndex(Index index) {
-        indexes.remove(index.getName());
+        indexes.remove(index.name());
     }
 
     @Override

@@ -52,9 +52,9 @@ public final class SqlVerifier {
     private List<Action> synchronizeColumns(Table table) throws SqlModellerException {
         Table sqlTable = modeller.readTable(table.getDatabase(), table.getName());
         Map<String, Column> tableColumns = table.getColumns().stream()
-                .collect(Collectors.toMap(Column::getName, col -> col));
+                .collect(Collectors.toMap(Column::name, col -> col));
         Map<String, Column> sqlColumns = sqlTable.getColumns().stream()
-                .collect(Collectors.toMap(Column::getName, col -> col));
+                .collect(Collectors.toMap(Column::name, col -> col));
         List<Action> actions = new ArrayList<>();
         for (var name : tableColumns.keySet()) {
             var tableColumn = tableColumns.get(name);
@@ -66,7 +66,7 @@ public final class SqlVerifier {
                         .map(n -> sqlColumns.get(n)).findFirst();
                 if (opt.isPresent()) {
                     var sqlColumn = opt.get();
-                    if (!sqlColumn.getName().equals(tableColumn.getName())) {
+                    if (!sqlColumn.name().equals(tableColumn.name())) {
                         modeller.renameColumn(sqlColumn, tableColumn);
                         actions.add(Action.renameColumn(sqlColumn, tableColumn));
                     }
@@ -84,7 +84,7 @@ public final class SqlVerifier {
                     modeller.deleteColumn(sqlColumn);
                     actions.add(Action.deleteColumn(sqlColumn));
                 } else {
-                    if (!sqlColumn.isNullable()) {
+                    if (!sqlColumn.nullable()) {
                         if (sqlColumn instanceof SqlColumn) {
                             ((SqlColumn) sqlColumn).setNullable(true);
                             modeller.modifyColumn(sqlColumn);
@@ -100,9 +100,9 @@ public final class SqlVerifier {
     private List<Action> synchronizeIndexes(Table table) throws SqlModellerException {
         Table sqlTable = modeller.readTable(table.getDatabase(), table.getName());
         Map<String, Index> tableIndexes = table.getIndexes().stream()
-                .collect(Collectors.toMap(Index::getName, col -> col));
+                .collect(Collectors.toMap(Index::name, col -> col));
         Map<String, Index> sqlIndexes = sqlTable.getIndexes().stream()
-                .collect(Collectors.toMap(Index::getName, col -> col));
+                .collect(Collectors.toMap(Index::name, col -> col));
         List<Action> actions = new ArrayList<>();
         for (String name : tableIndexes.keySet()) {
             Index tableIndex = tableIndexes.get(name);
@@ -130,19 +130,19 @@ public final class SqlVerifier {
     }
 
     private boolean isNotSame(Column one, Column other) {
-        return one.isAutoIncrement() != other.isAutoIncrement()
-                || one.isNullable() != other.isNullable()
-                || one.isKey() != other.isKey()
-                || !one.getName().equals(other.getName())
+        return one.autoIncrement() != other.autoIncrement()
+                || one.nullable() != other.nullable()
+                || one.key() != other.key()
+                || !one.name().equals(other.name())
                 || !modeller.typesAreCompatible(one, other)
                 || !isSameDefault(one, other);
     }
 
     private boolean isSame(Index one, Index other) {
-        boolean same = one.getName().equals(other.getName())
-                && (one.isUnique() == other.isUnique());
+        boolean same = one.name().equals(other.name())
+                && (one.unique() == other.unique());
         if (same) {
-            return isSame(one.getColumns(), other.getColumns());
+            return isSame(one.columns(), other.columns());
         }
         return false;
     }
@@ -151,8 +151,8 @@ public final class SqlVerifier {
         if (one.size() != other.size()) {
             return false;
         }
-        Map<String, Column> oneMap = one.stream().collect(Collectors.toMap(Column::getName, col -> col));
-        Map<String, Column> otherMap = other.stream().collect(Collectors.toMap(Column::getName, col -> col));
+        Map<String, Column> oneMap = one.stream().collect(Collectors.toMap(Column::name, col -> col));
+        Map<String, Column> otherMap = other.stream().collect(Collectors.toMap(Column::name, col -> col));
         for (String name : oneMap.keySet()) {
             if (!otherMap.containsKey(name)) {
                 return false;
@@ -165,28 +165,28 @@ public final class SqlVerifier {
     }
 
     private boolean isSameDefault(Column one, Column other) {
-        if (one.getDefault() == null) {
-            return other.getDefault() == null;
+        if (one.defaultValue() == null) {
+            return other.defaultValue() == null;
         }
-        if (other.getDefault() == null) {
+        if (other.defaultValue() == null) {
             return false;
         }
         return switch (one) {
             case BooleanColumn bc -> booleanValue(bc) == booleanValue(other);
             case BitColumn bc -> switch (other) {
                 case BooleanColumn obc -> booleanValue(bc) == booleanValue(obc);
-                default -> one.getDefault().equals(other.getDefault());
+                default -> one.defaultValue().equals(other.defaultValue());
             };
             case IntegerColumn ic -> switch (other) {
                 case BooleanColumn bc -> booleanValue(bc) == booleanValue(ic);
-                default -> one.getDefault().equals(other.getDefault());
+                default -> one.defaultValue().equals(other.defaultValue());
             };
-            default -> one.getDefault().equals(other.getDefault());
+            default -> one.defaultValue().equals(other.defaultValue());
         };
     }
 
     private boolean booleanValue(Column column) {
-        return switch (column.getDefault()) {
+        return switch (column.defaultValue()) {
             case "1", "TRUE", "true" -> true;
             default -> false;
         };

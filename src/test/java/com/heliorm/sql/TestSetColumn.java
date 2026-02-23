@@ -3,7 +3,7 @@ package com.heliorm.sql;
 import java.sql.JDBCType;
 import java.util.Set;
 
-public class TestSetColumn extends TestColumn implements SetColumn {
+public final class TestSetColumn extends TestColumn implements SetColumn {
 
     private final Set<String> setValues;
 
@@ -13,7 +13,7 @@ public class TestSetColumn extends TestColumn implements SetColumn {
     }
 
     @Override
-    public Set<String> getSetValues() {
+    public Set<String> setValues() {
         return setValues;
     }
 }

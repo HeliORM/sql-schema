@@ -3,7 +3,7 @@ package com.heliorm.sql;
 import java.sql.JDBCType;
 import java.util.Set;
 
-public abstract class TestColumn implements Column {
+public abstract class TestColumn {
 
     private final Table table;
     private final String name;
@@ -26,49 +26,49 @@ public abstract class TestColumn implements Column {
         this.table = table;
         this.name = name;
         this.jdbcType = jdbcType;
-        this.nullable  = nullable;
+        this.nullable = nullable;
         this.key = key;
         this.autoIncrement = autoIncrement;
-        this.enumValues =enumValues;
+        this.enumValues = enumValues;
         this.defaultValue = defaultValue;
     }
 
-    @Override
-    public String getName() {
+
+    public String name() {
         return name;
     }
 
-    @Override
-    public JDBCType getJdbcType() {
+
+    public JDBCType jdbcType() {
         return jdbcType;
     }
 
-    @Override
-    public Table getTable() {
+
+    public Table table() {
         return table;
     }
 
-    @Override
-    public boolean isNullable() {
+
+    public boolean nullable() {
         return nullable;
     }
 
-    @Override
-    public boolean isKey() {
+
+    public boolean key() {
         return key;
     }
 
-    @Override
-    public boolean isAutoIncrement() {
+
+    public boolean autoIncrement() {
         return autoIncrement;
     }
 
-    @Override
-    public String getDefault() {
+
+    public String defaultValue() {
         return defaultValue;
     }
 
-    @Override
+
     public int hashCode() {
         int result = table != null ? table.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);

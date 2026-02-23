@@ -16,7 +16,7 @@ final class SqlEnumColumn extends SqlColumn implements EnumColumn{
     }
 
     @Override
-    public Set<String> getEnumValues() {
+    public Set<String> enumValues() {
         return enumValues;
     }
 }

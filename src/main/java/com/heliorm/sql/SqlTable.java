@@ -20,11 +20,11 @@ final class SqlTable implements Table {
     }
 
     void addColumn(Column column) {
-        columns.put(column.getName(), column);
+        columns.put(column.name(), column);
     }
 
     void addIndex(Index index) {
-        indexes.put(index.getName(), index);
+        indexes.put(index.name(), index);
     }
 
     @Override

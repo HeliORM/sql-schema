@@ -1,5 +1,5 @@
 package com.heliorm.sql;
 
 /** Column representing an integer number */
-public interface IntegerColumn extends Column {
+public non-sealed interface IntegerColumn extends Column {
 }

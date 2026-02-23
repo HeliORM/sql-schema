@@ -55,7 +55,7 @@ public final class PostgresModeller extends SqlModeller {
         try (Connection con = con(); Statement stmt = con.createStatement()) {
             stmt.executeUpdate(makeModifyIndexQuery(index));
         } catch (SQLException ex) {
-            throw new SqlModellerException(format("Error modifying index '%s' in table '%s' (%s)", index.getName(), index.getTable().getName(), ex.getMessage()));
+            throw new SqlModellerException(format("Error modifying index '%s' in table '%s' (%s)", index.name(), index.table().getName(), ex.getMessage()));
         }
     }
 
@@ -80,15 +80,15 @@ public final class PostgresModeller extends SqlModeller {
     protected boolean typesAreCompatible(Column one, Column other) {
         if (one instanceof BooleanColumn) {
             if (other instanceof BitColumn) {
-                return ((BitColumn) other).getBits() == 1;
+                return ((BitColumn) other).bits() == 1;
             }
             return other instanceof BooleanColumn;
         }
         if (one instanceof BitColumn) {
             if (other instanceof BitColumn) {
-                return ((BitColumn) one).getBits() == ((BitColumn) other).getBits();
+                return ((BitColumn) one).bits() == ((BitColumn) other).bits();
             }
-            return other instanceof BooleanColumn && ((BitColumn) one).getBits() == 1;
+            return other instanceof BooleanColumn && ((BitColumn) one).bits() == 1;
         }
         if (one instanceof StringColumn) {
             if (other instanceof StringColumn) {
@@ -98,27 +98,27 @@ public final class PostgresModeller extends SqlModeller {
         }
         if (one instanceof DecimalColumn) {
             if (other instanceof DecimalColumn) {
-                if (one.getJdbcType() == JDBCType.DOUBLE) {
-                    if (other.getJdbcType() == JDBCType.DOUBLE) {
+                if (one.jdbcType() == JDBCType.DOUBLE) {
+                    if (other.jdbcType() == JDBCType.DOUBLE) {
                         return true;
                     }
                 }
-                return ((DecimalColumn) one).getPrecision() == ((DecimalColumn) other).getPrecision()
-                        && ((DecimalColumn) one).getScale() == ((DecimalColumn) other).getScale();
+                return ((DecimalColumn) one).precision() == ((DecimalColumn) other).precision()
+                        && ((DecimalColumn) one).scale() == ((DecimalColumn) other).scale();
             }
-            return other.getJdbcType() == JDBCType.NUMERIC;
+            return other.jdbcType() == JDBCType.NUMERIC;
         }
         if (one instanceof BinaryColumn) {
             return other instanceof BinaryColumn;
         }
-        if (one.getJdbcType() == JDBCType.NUMERIC) {
-            switch (other.getJdbcType()) {
+        if (one.jdbcType() == JDBCType.NUMERIC) {
+            switch (other.jdbcType()) {
                 case NUMERIC:
                 case DECIMAL:
                     return true;
             }
         }
-        return one.getJdbcType() == other.getJdbcType();
+        return one.jdbcType() == other.jdbcType();
     }
 
     @Override
@@ -139,13 +139,13 @@ public final class PostgresModeller extends SqlModeller {
     @Override
     public List<String> makeModifyColumnQuery(Column column) throws SqlModellerException {
         StringBuilder sql = new StringBuilder();
-        sql.append(format("ALTER TABLE %s", getTableName(column.getTable())));
+        sql.append(format("ALTER TABLE %s", getTableName(column.table())));
         sql.append(format("ALTER %s DROP DEFAULT", getColumnName(column)));
         sql.append(format(",ALTER %s TYPE %s USING(%s::text::%s)",
                 getColumnName(column), createBasicType(column),
                 getColumnName(column),
                 typeName(column)));
-        if (!column.isNullable()) {
+        if (!column.nullable()) {
             sql.append(format(",ALTER %s SET NOT NULL", getColumnName(column)));
         } else {
             sql.append(format(",ALTER %s DROP NOT NULL", getColumnName(column)));
@@ -160,26 +160,26 @@ public final class PostgresModeller extends SqlModeller {
 
     @Override
     protected String getDatabaseName(Database database) {
-        return format("\"%s\"", database.getName());
+        return format("\"%s\"", database.name());
     }
 
     @Override
     protected String getTableName(Table table) {
-        return format("\"%s\".\"public\".\"%s\"", table.getDatabase().getName(), table.getName());
+        return format("\"%s\".\"public\".\"%s\"", table.getDatabase().name(), table.getName());
     }
 
     @Override
     protected String getCreateType(Column column) throws SqlModellerException {
         StringBuilder type = new StringBuilder();
         type.append(createBasicType(column));
-        if (column.isKey()) {
+        if (column.key()) {
             type.append(" PRIMARY KEY");
         }
-        if (!column.isNullable()) {
+        if (!column.nullable()) {
             type.append(" NOT NULL");
         }
-        if (column.getDefault() != null)
-            type.append(format(" DEFAULT '%s'", column.getDefault()));
+        if (column.defaultValue() != null)
+            type.append(format(" DEFAULT '%s'", column.defaultValue()));
         return type.toString();
     }
 
@@ -195,12 +195,12 @@ public final class PostgresModeller extends SqlModeller {
 
     @Override
     protected String getColumnName(Column column) {
-        return format("\"%s\"", column.getName());
+        return format("\"%s\"", column.name());
     }
 
     @Override
     protected String getIndexName(Index index) {
-        return format("\"%s\"", index.getName());
+        return format("\"%s\"", index.name());
     }
 
     @Override
@@ -212,7 +212,7 @@ public final class PostgresModeller extends SqlModeller {
             throw new SqlModellerException("SET data types are not supported for PostgreSQL");
         }
         buf.append(format("ALTER TABLE %s ADD COLUMN %s %s",
-                getTableName(column.getTable()),
+                getTableName(column.table()),
                 getColumnName(column),
                 getCreateType(column)));
         return buf.toString();
@@ -257,7 +257,7 @@ public final class PostgresModeller extends SqlModeller {
                         .map(String::trim)
                         .collect(Collectors.toSet());
             }
-            throw new SqlModellerException(format("No enum values found for column %s in table %s ", column.getName(), column.getTable().getName()));
+            throw new SqlModellerException(format("No enum values found for column %s in table %s ", column.name(), column.table().getName()));
         } catch (SQLException ex) {
             throw new SqlModellerException(format("Error reading enum values (%s)", ex.getMessage()), ex);
         }
@@ -282,14 +282,14 @@ public final class PostgresModeller extends SqlModeller {
     private String getSqlTypeName(Column column) throws SqlModellerException {
         try (var con = con()) {
             var dbm = con.getMetaData();
-            try (var rs = dbm.getColumns(column.getTable().getDatabase().getName(), null, column.getTable().getName(), column.getName())) {
+            try (var rs = dbm.getColumns(column.table().getDatabase().name(), null, column.table().getName(), column.name())) {
                 if (rs.next()) {
                     return rs.getString("TYPE_NAME");
                 }
             }
-            throw new SqlModellerException(format("Column %s found in table %s ", column.getName(), column.getTable().getName()));
+            throw new SqlModellerException(format("Column %s found in table %s ", column.name(), column.table().getName()));
         } catch (SQLException ex) {
-            throw new SqlModellerException(format("Error determining SQL type name for column %s in table %s ", column.getName(), column.getTable().getName()));
+            throw new SqlModellerException(format("Error determining SQL type name for column %s in table %s ", column.name(), column.table().getName()));
         }
     }
 
@@ -300,14 +300,14 @@ public final class PostgresModeller extends SqlModeller {
      * @throws SqlModellerException Thrown if it goes worng
      */
     private void modifyEnumColumn(EnumColumn column) throws SqlModellerException {
-        var want = column.getEnumValues();
+        var want = column.enumValues();
         var have = readEnumValues(column);
         if (!want.equals(have)) {
             var query = new StringJoiner(";");
             query.add(format("ALTER TYPE %s RENAME TO %s_old", typeName(column), typeName(column)));
             query.add(makeAddEnumTypeQuery(column));
             query.add(format("ALTER TABLE %s COLUMN %s TYPE %s USING %s::text::%s",
-                    getTableName(column.getTable()),
+                    getTableName(column.table()),
                     getColumnName(column),
                     typeName(column),
                     getColumnName(column),
@@ -333,7 +333,7 @@ public final class PostgresModeller extends SqlModeller {
         buf.add("BEGIN");
         buf.add(format("    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = '%s') THEN", typeName));
         buf.add(format("        CREATE TYPE \"%s\" AS ENUM(", typeName));
-        buf.add(column.getEnumValues().stream()
+        buf.add(column.enumValues().stream()
                 .map(v -> "'" + v + "'")
                 .collect(Collectors.joining(",")));
         buf.add(");");
@@ -362,47 +362,47 @@ public final class PostgresModeller extends SqlModeller {
                     typeName = format("VARCHAR(%d)", length);
                 }
             }
-            case DecimalColumn ignored -> typeName = switch (column.getJdbcType()) {
+            case DecimalColumn ignored -> typeName = switch (column.jdbcType()) {
                 case DOUBLE -> "DOUBLE PRECISION";
-                case FLOAT -> format("FLOAT(%d)", ((DecimalColumn) column).getPrecision());
+                case FLOAT -> format("FLOAT(%d)", ((DecimalColumn) column).precision());
                 case NUMERIC, DECIMAL ->
-                        format("DECIMAL(%d,%d)", ((DecimalColumn) column).getPrecision(), ((DecimalColumn) column).getScale());
+                        format("DECIMAL(%d,%d)", ((DecimalColumn) column).precision(), ((DecimalColumn) column).scale());
                 default ->
-                        throw new SqlModellerException(format("Unexpected JDBC type %s in decimal column", column.getJdbcType()));
+                        throw new SqlModellerException(format("Unexpected JDBC type %s in decimal column", column.jdbcType()));
             };
             case BinaryColumn ignored -> typeName = "BYTEA";
             default -> {
-                switch (column.getJdbcType()) {
+                switch (column.jdbcType()) {
                     case TINYINT -> {
-                        if (column.isKey() && column.isAutoIncrement()) {
+                        if (column.key() && column.autoIncrement()) {
                             typeName = "SERIAL";
                         } else {
                             typeName = "TINYINT";
                         }
                     }
                     case SMALLINT -> {
-                        if (column.isKey() && column.isAutoIncrement()) {
+                        if (column.key() && column.autoIncrement()) {
                             typeName = "SERIAL";
                         } else {
                             typeName = "SMALLINT";
                         }
                     }
                     case INTEGER -> {
-                        if (column.isKey() && column.isAutoIncrement()) {
+                        if (column.key() && column.autoIncrement()) {
                             typeName = "SERIAL";
                         } else {
                             typeName = "INTEGER";
                         }
                     }
                     case BIGINT -> {
-                        if (column.isKey() && column.isAutoIncrement()) {
+                        if (column.key() && column.autoIncrement()) {
                             typeName = "BIGSERIAL";
                         } else {
                             typeName = "BIGINT";
                         }
                     }
                     case DOUBLE -> typeName = "DOUBLE PRECISION";
-                    default -> typeName = column.getJdbcType().getName();
+                    default -> typeName = column.jdbcType().getName();
                 }
             }
         }
@@ -418,32 +418,32 @@ public final class PostgresModeller extends SqlModeller {
      */
     private String typeName(Column column) {
         if (column instanceof EnumColumn) {
-            return format("%s_%s", column.getTable().getName(), column.getName());
+            return format("%s_%s", column.table().getName(), column.name());
         }
-        switch (column.getJdbcType()) {
+        switch (column.jdbcType()) {
             case TINYINT -> {
-                if (column.isKey() && column.isAutoIncrement()) {
+                if (column.key() && column.autoIncrement()) {
                     return "SERIAL";
                 } else {
                     return "TINYINT";
                 }
             }
             case SMALLINT -> {
-                if (column.isKey() && column.isAutoIncrement()) {
+                if (column.key() && column.autoIncrement()) {
                     return "SERIAL";
                 } else {
                     return "SMALLINT";
                 }
             }
             case INTEGER -> {
-                if (column.isKey() && column.isAutoIncrement()) {
+                if (column.key() && column.autoIncrement()) {
                     return "SERIAL";
                 } else {
                     return "INTEGER";
                 }
             }
             case BIGINT -> {
-                if (column.isKey() && column.isAutoIncrement()) {
+                if (column.key() && column.autoIncrement()) {
                     return "BIGSERIAL";
                 } else {
                     return "BIGINT";
@@ -460,10 +460,10 @@ public final class PostgresModeller extends SqlModeller {
                 }
             }
             default -> {
-                return column.getJdbcType().getName();
+                return column.jdbcType().getName();
             }
         }
-        return column.getJdbcType().getName();
+        return column.jdbcType().getName();
     }
 
     /**

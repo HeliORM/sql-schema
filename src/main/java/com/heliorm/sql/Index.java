@@ -11,24 +11,24 @@ public interface Index {
      *
      * @return The name
      */
-    String getName();
+    String name();
 
     /** Get the table to which the index applies
      *
      * @return The table
      */
-    Table getTable();
+    Table table();
 
     /** Get the columns in the table making up the index.
      *
      * @return The columns
      */
-    Set<Column> getColumns();
+    Set<Column> columns();
 
     /** Is the index unique?
      *
      * @return True if so
      */
-    boolean isUnique();
+    boolean unique();
 
 }

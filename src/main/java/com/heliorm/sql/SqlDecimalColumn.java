@@ -17,12 +17,12 @@ final class SqlDecimalColumn extends SqlColumn implements DecimalColumn {
     }
 
     @Override
-    public int getPrecision() {
+    public int precision() {
         return precision;
     }
 
     @Override
-    public int getScale() {
+    public int scale() {
         return scale;
     }
 }

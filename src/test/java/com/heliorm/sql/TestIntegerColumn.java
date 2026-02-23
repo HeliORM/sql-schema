@@ -3,7 +3,7 @@ package com.heliorm.sql;
 import java.sql.JDBCType;
 import java.util.Collections;
 
-public class TestIntegerColumn extends TestColumn implements IntegerColumn{
+public final class TestIntegerColumn extends TestColumn implements IntegerColumn{
 
     public TestIntegerColumn(Table table, String name, JDBCType jdbcType) {
         super(table, name, jdbcType);

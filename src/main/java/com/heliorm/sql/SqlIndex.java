@@ -23,26 +23,26 @@ final class SqlIndex implements Index {
     }
 
     @Override
-    public String getName() {
+    public String name() {
         return name;
     }
 
     @Override
-    public Table getTable() {
+    public Table table() {
         return table;
     }
 
     @Override
-    public Set<Column> getColumns() {
+    public Set<Column> columns() {
         return new HashSet<>(columns.values());
     }
 
     @Override
-    public boolean isUnique() {
+    public boolean unique() {
         return unique;
     }
 
     void addColunm(Column column) {
-        columns.put(column.getName(), column);
+        columns.put(column.name(), column);
     }
 }

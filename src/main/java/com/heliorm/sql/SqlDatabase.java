@@ -20,12 +20,12 @@ final class SqlDatabase implements Database {
     }
 
     @Override
-    public String getName() {
+    public String name() {
         return name;
     }
 
     @Override
-    public Set<Table> getTables() {
+    public Set<Table> tables() {
         return tables;
     }
 }

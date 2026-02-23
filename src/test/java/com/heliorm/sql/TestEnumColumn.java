@@ -3,7 +3,7 @@ package com.heliorm.sql;
 import java.sql.JDBCType;
 import java.util.Set;
 
-public class TestEnumColumn extends TestColumn implements EnumColumn {
+public final class TestEnumColumn extends TestColumn implements EnumColumn {
 
     private final Set<String> enumValues;
 
@@ -14,7 +14,7 @@ public class TestEnumColumn extends TestColumn implements EnumColumn {
 
 
     @Override
-    public Set<String> getEnumValues() {
+    public Set<String> enumValues() {
         return enumValues;
     }
 }

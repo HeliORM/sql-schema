@@ -15,7 +15,7 @@ final class SqlBitColumn extends SqlColumn implements BitColumn {
     }
 
     @Override
-    public int getBits() {
+    public int bits() {
         return bits;
     }
 }

@@ -6,7 +6,7 @@ import java.sql.JDBCType;
 /** Implementation of a column that is populated by reading from SQL
  *
  */
-abstract class SqlColumn implements Column {
+abstract non-sealed class SqlColumn implements Column {
 
     private final Table table;
     private final String name;
@@ -31,37 +31,37 @@ abstract class SqlColumn implements Column {
     }
 
     @Override
-    public Table getTable() {
+    public Table table() {
         return table;
     }
 
     @Override
-    public String getName() {
+    public String name() {
         return name;
     }
 
     @Override
-    public JDBCType getJdbcType() {
+    public JDBCType jdbcType() {
         return jdbcType;
     }
 
     @Override
-    public boolean isNullable() {
+    public boolean nullable() {
         return nullable;
     }
 
     @Override
-    public boolean isKey() {
+    public boolean key() {
         return key;
     }
 
     @Override
-    public boolean isAutoIncrement() {
+    public boolean autoIncrement() {
         return autoIncrement;
     }
 
     @Override
-    public String getDefault() {
+    public String defaultValue() {
         return defaultValue;
     }
 

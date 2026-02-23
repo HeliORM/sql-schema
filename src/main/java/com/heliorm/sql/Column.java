@@ -5,48 +5,48 @@ import java.sql.JDBCType;
 /** Abstraction representing a SQL table column
  *
  */
-public interface Column {
+public sealed interface Column permits BinaryColumn, BitColumn, BooleanColumn, DateTimeColumn, DecimalColumn, DoubleColumn, EnumColumn, IntegerColumn, SetColumn, SqlColumn, StringColumn, TimeStampColumn {
 
     /** Return the name of the column.
      *
      * @return The name
      */
-    String getName();
+    String name();
 
     /** Return the JDBC type of the column.
      *
      * @return The type
      */
-    JDBCType getJdbcType();
+    JDBCType jdbcType();
 
     /** Return the table in which this column is.
      *
      * @return The table
      */
-    Table getTable();
+    Table table();
 
     /** Return if the column can be null.
      *
      * @return True if it can be null
      */
-    boolean isNullable();
+    boolean nullable();
 
     /** Return if the column is the primary key for a table.
      *
      * @return True if it is
      */
-    boolean isKey();
+    boolean key();
 
     /** Return if the column is an auto-increment key
      *
      * @return True if it is
      */
-    boolean isAutoIncrement();
+    boolean autoIncrement();
 
     /** Get the default value for the column
      *
      * @return The default value
      */
-    String getDefault();
+    String defaultValue();
 
 }

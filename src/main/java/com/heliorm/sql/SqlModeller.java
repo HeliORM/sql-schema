@@ -25,7 +25,6 @@ public abstract class SqlModeller {
 
     private final Supplier<Connection> supplier;
 
-
     /**
      * Create a modeller for MySQL/MariaDB databases.
      *
@@ -85,14 +84,14 @@ public abstract class SqlModeller {
             var dbm = con.getMetaData();
             var table = new SqlTable(database, name);
             var sqlColumns = new HashMap<String, SqlColumn>();
-            try (var columns = dbm.getColumns(database.getName(), null, table.getName(), "%")) {
+            try (var columns = dbm.getColumns(database.name(), null, table.getName(), "%")) {
                 while (columns.next()) {
                     var column = getColumnFromResultSet(table, columns);
-                    sqlColumns.put(column.getName(), column);
+                    sqlColumns.put(column.name(), column);
                 }
             }
             var keyNames = new HashSet<String>();
-            try (var keys = dbm.getPrimaryKeys(database.getName(), null, table.getName())) {
+            try (var keys = dbm.getPrimaryKeys(database.name(), null, table.getName())) {
                 while (keys.next()) {
                     var column = sqlColumns.get(keys.getString("COLUMN_NAME"));
                     var pkName = keys.getString("PK_NAME");
@@ -107,7 +106,7 @@ public abstract class SqlModeller {
                 table.addColumn(column);
             }
             var idxMap = new HashMap<String, SqlIndex>();
-            try (var indexes = dbm.getIndexInfo(database.getName(), null, table.getName(), false, false)) {
+            try (var indexes = dbm.getIndexInfo(database.name(), null, table.getName(), false, false)) {
                 while (indexes.next()) {
                     var index_name = indexes.getString("INDEX_NAME");
                     var column_name = indexes.getString("COLUMN_NAME");
@@ -123,7 +122,7 @@ public abstract class SqlModeller {
                 }
             }
             for (Index index : idxMap.values()) {
-                if (!keyNames.contains(index.getName())) {
+                if (!keyNames.contains(index.name())) {
                     table.addIndex(index);
                 }
             }
@@ -189,7 +188,7 @@ public abstract class SqlModeller {
         try (var con = con(); var stmt = con.createStatement()) {
             stmt.executeUpdate(makeAddColumnQuery(column));
         } catch (SQLException ex) {
-            throw new SqlModellerException(format("Error adding column '%s' to table '%s' (%s)", column.getName(), column.getTable().getName(), ex.getMessage()), ex);
+            throw new SqlModellerException(format("Error adding column '%s' to table '%s' (%s)", column.name(), column.table().getName(), ex.getMessage()), ex);
         }
     }
 
@@ -204,7 +203,7 @@ public abstract class SqlModeller {
         try (var con = con(); var stmt = con.createStatement()) {
             stmt.executeUpdate(makeRenameColumnQuery(current, changed));
         } catch (SQLException ex) {
-            throw new SqlModellerException(format("Error renaming column '%s' in table '%s' (%s)", current.getName(), current.getTable().getName(), ex.getMessage()), ex);
+            throw new SqlModellerException(format("Error renaming column '%s' in table '%s' (%s)", current.name(), current.table().getName(), ex.getMessage()), ex);
         }
     }
 
@@ -218,7 +217,7 @@ public abstract class SqlModeller {
         try (var con = con(); var stmt = con.createStatement()) {
             stmt.executeUpdate(makeDeleteColumnQuery(column));
         } catch (SQLException ex) {
-            throw new SqlModellerException(format("Error deleting column '%s' from table '%s' (%s)", column.getName(), column.getTable().getName(), ex.getMessage()), ex);
+            throw new SqlModellerException(format("Error deleting column '%s' from table '%s' (%s)", column.name(), column.table().getName(), ex.getMessage()), ex);
         }
     }
 
@@ -234,7 +233,7 @@ public abstract class SqlModeller {
                 stmt.executeUpdate(sql);
             }
         } catch (SQLException ex) {
-            throw new SqlModellerException(format("Error modifying column '%s' in table '%s' (%s)", changed.getName(), changed.getTable().getName(), ex.getMessage()), ex);
+            throw new SqlModellerException(format("Error modifying column '%s' in table '%s' (%s)", changed.name(), changed.table().getName(), ex.getMessage()), ex);
         }
     }
 
@@ -244,10 +243,9 @@ public abstract class SqlModeller {
                 stmt.executeUpdate(sql);
             }
         } catch (SQLException ex) {
-            throw new SqlModellerException(format("Error modifying column '%s' in table '%s' (%s)", current.getName(), current.getTable().getName(), ex.getMessage()), ex);
+            throw new SqlModellerException(format("Error modifying column '%s' in table '%s' (%s)", current.name(), current.table().getName(), ex.getMessage()), ex);
         }
     }
-
 
     /**
      * Add an index to a SQL table.
@@ -258,7 +256,7 @@ public abstract class SqlModeller {
         try (var con = con(); var stmt = con.createStatement()) {
             stmt.executeUpdate(makeAddIndexQuery(index));
         } catch (SQLException ex) {
-            throw new SqlModellerException(format("Error adding index '%s' in table '%s' (%s)", index.getName(), index.getTable().getName(), ex.getMessage()), ex);
+            throw new SqlModellerException(format("Error adding index '%s' in table '%s' (%s)", index.name(), index.table().getName(), ex.getMessage()), ex);
         }
     }
 
@@ -272,7 +270,7 @@ public abstract class SqlModeller {
         try (var con = con(); var stmt = con.createStatement()) {
             stmt.executeUpdate(makeRenameIndexQuery(current, changed));
         } catch (SQLException ex) {
-            throw new SqlModellerException(format("Error renaming index '%s' in table '%s' (%s)", current.getName(), current.getTable().getName(), ex.getMessage()), ex);
+            throw new SqlModellerException(format("Error renaming index '%s' in table '%s' (%s)", current.name(), current.table().getName(), ex.getMessage()), ex);
         }
     }
 
@@ -299,7 +297,7 @@ public abstract class SqlModeller {
         try (var con = con(); var stmt = con.createStatement()) {
             stmt.executeUpdate(makeRemoveIndexQuery(index));
         } catch (SQLException ex) {
-            throw new SqlModellerException(format("Error removing index '%s' in table '%s' (%s)", index.getName(), index.getTable().getName(), ex.getMessage()));
+            throw new SqlModellerException(format("Error removing index '%s' in table '%s' (%s)", index.name(), index.table().getName(), ex.getMessage()));
         }
     }
 
@@ -329,7 +327,6 @@ public abstract class SqlModeller {
      * @return The set of strings.
      */
     protected abstract Set<String> extractSetValues(String string);
-
 
     /**
      * Extract the default value from a string
@@ -365,10 +362,10 @@ public abstract class SqlModeller {
      */
     protected final String makeAddIndexQuery(Index index) {
         return format("CREATE %sINDEX %s on %s (%s)",
-                index.isUnique() ? "UNIQUE " : "",
+                index.unique() ? "UNIQUE " : "",
                 getIndexName(index),
-                getTableName(index.getTable()),
-                index.getColumns().stream()
+                getTableName(index.table()),
+                index.columns().stream()
                         .map(this::getColumnName)
                         .collect(Collectors.joining(",")));
     }
@@ -405,7 +402,6 @@ public abstract class SqlModeller {
      */
     protected abstract String getTableName(Table table);
 
-
     /**
      * Generate the database specific database name from a database.
      *
@@ -422,7 +418,6 @@ public abstract class SqlModeller {
     protected final Connection con() {
         return supplier.get();
     }
-
 
     /**
      * Generate SQL statement to modify an index.
@@ -461,7 +456,7 @@ public abstract class SqlModeller {
     }
 
     protected final int actualLength(BinaryColumn column) {
-        var length = column.getLength();
+        var length = column.length();
         if (length > 16777215) {
             return 2147483647;
         } else if (length > 65535) {
@@ -545,7 +540,7 @@ public abstract class SqlModeller {
             return Collections.emptySet();
         } catch (SQLException ex) {
             throw new SqlModellerException(format("Error reading set values from %s.%s.%s (%s)",
-                    column.getTable().getDatabase().getName(), column.getTable().getName(), column.getName(), ex.getMessage()), ex);
+                    column.table().getDatabase().name(), column.table().getName(), column.name(), ex.getMessage()), ex);
         }
     }
 
@@ -567,7 +562,7 @@ public abstract class SqlModeller {
      */
     private String makeRenameColumnQuery(Column column, Column changed) {
         return format("ALTER TABLE %s RENAME COLUMN %s TO %s",
-                getTableName(column.getTable()),
+                getTableName(column.table()),
                 getColumnName(column),
                 getColumnName(changed));
     }
@@ -580,7 +575,7 @@ public abstract class SqlModeller {
      */
     private String makeDeleteColumnQuery(Column column) {
         return format("ALTER TABLE %s DROP COLUMN %s",
-                getTableName(column.getTable()),
+                getTableName(column.table()),
                 getColumnName(column));
     }
 

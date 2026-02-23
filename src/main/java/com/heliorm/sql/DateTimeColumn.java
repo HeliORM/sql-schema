@@ -1,4 +1,4 @@
 package com.heliorm.sql;
 
-public interface DateTimeColumn extends Column {
+public non-sealed interface DateTimeColumn extends Column {
 }

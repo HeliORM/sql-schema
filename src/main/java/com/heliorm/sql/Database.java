@@ -11,12 +11,12 @@ public interface Database {
      *
      * @return The name
       */
-    String getName();
+    String name();
 
     /** Return the tables in this database.
      *
      * @return The tables
      */
-    Set<Table> getTables();
+    Set<Table> tables();
 
 }

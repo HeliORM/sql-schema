@@ -3,7 +3,7 @@ package com.heliorm.sql;
 import java.util.HashSet;
 import java.util.Set;
 
-public class TestDatabase implements Database {
+public final class TestDatabase implements Database {
 
     private final String name;
     private final Set<Table> tables;
@@ -14,12 +14,12 @@ public class TestDatabase implements Database {
     }
 
     @Override
-    public String getName() {
+    public String name() {
         return name;
     }
 
     @Override
-    public Set<Table> getTables() {
+    public Set<Table> tables() {
         return tables;
     }
 }
