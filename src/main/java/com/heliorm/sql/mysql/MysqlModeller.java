@@ -16,6 +16,7 @@ import com.heliorm.sql.SqlModeller;
 import com.heliorm.sql.SqlModellerException;
 import com.heliorm.sql.StringColumn;
 import com.heliorm.sql.Table;
+import com.heliorm.sql.TimeColumn;
 import com.heliorm.sql.TimeStampColumn;
 
 import java.sql.Connection;
@@ -147,6 +148,7 @@ public final class MysqlModeller extends SqlModeller {
                 }
             }
             case DateColumn ignored -> typeName = "DATE";
+            case TimeColumn ignored -> typeName = "TIME";
             case DateTimeColumn ignored -> typeName = "DATETIME";
             case TimeStampColumn ignored -> typeName = "TIMESTAMP";
             case DoubleColumn ignored -> typeName = "DOUBLE";
@@ -323,6 +325,10 @@ public final class MysqlModeller extends SqlModeller {
             return false;
         } else if (one instanceof DateColumn) {
             if (other instanceof DateColumn) {
+                return true;
+            }
+        } else if (one instanceof TimeColumn) {
+            if (other instanceof TimeColumn) {
                 return true;
             }
         } else if (one instanceof DateTimeColumn) {

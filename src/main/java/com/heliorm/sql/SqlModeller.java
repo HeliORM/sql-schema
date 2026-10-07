@@ -649,6 +649,9 @@ public abstract class SqlModeller {
             if (jdbcType == JDBCType.DATE) {
                 return new SqlDateColumn(table, columnName, nullable, defVal);
             }
+            if (jdbcType == JDBCType.TIME) {
+                return new SqlTimeColumn(table, columnName, nullable, defVal);
+            }
             if (isDateTimeColumn(jdbcType)) {
                 if (typeName.equals("DATETIME")) {
                     return new SqlDateTimeColumn(table, columnName, jdbcType, nullable, defVal);

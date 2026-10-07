@@ -8,6 +8,7 @@ import com.heliorm.sql.Database;
 import com.heliorm.sql.DecimalColumn;
 import com.heliorm.sql.EnumColumn;
 import com.heliorm.sql.Index;
+import com.heliorm.sql.IntegerColumn;
 import com.heliorm.sql.SetColumn;
 import com.heliorm.sql.SqlModeller;
 import com.heliorm.sql.SqlModellerException;
@@ -111,6 +112,10 @@ public final class PostgresModeller extends SqlModeller {
         if (one instanceof BinaryColumn) {
             return other instanceof BinaryColumn;
         }
+        if (isSmallInteger(one) && isSmallInteger(other)) {
+            // a TINYINT is created as SMALLINT, because PostgreSQL has no TINYINT
+            return true;
+        }
         if (one.jdbcType() == JDBCType.NUMERIC) {
             switch (other.jdbcType()) {
                 case NUMERIC:
@@ -119,6 +124,11 @@ public final class PostgresModeller extends SqlModeller {
             }
         }
         return one.jdbcType() == other.jdbcType();
+    }
+
+    private boolean isSmallInteger(Column column) {
+        return column instanceof IntegerColumn
+                && ((column.jdbcType() == JDBCType.TINYINT) || (column.jdbcType() == JDBCType.SMALLINT));
     }
 
     @Override
@@ -392,10 +402,11 @@ public final class PostgresModeller extends SqlModeller {
             default -> {
                 switch (column.jdbcType()) {
                     case TINYINT -> {
+                        // PostgreSQL has no TINYINT, and the smallest integer is SMALLINT
                         if (column.key() && column.autoIncrement()) {
                             typeName = "SERIAL";
                         } else {
-                            typeName = "TINYINT";
+                            typeName = "SMALLINT";
                         }
                     }
                     case SMALLINT -> {
@@ -443,7 +454,7 @@ public final class PostgresModeller extends SqlModeller {
                 if (column.key() && column.autoIncrement()) {
                     return "SERIAL";
                 } else {
-                    return "TINYINT";
+                    return "SMALLINT";
                 }
             }
             case SMALLINT -> {

@@ -55,6 +55,26 @@ public final class TestCRUD extends AbstractSqlTest {
     }
 
     @Test
+    @Order(24)
+    public void addTimeColumn() throws SqlModellerException {
+        var opens = new TestTimeColumn(table, "opens", true);
+        table.addColumn(opens);
+        modeller.addColumn(opens);
+        var loaded = modeller.readTable(db, "Person");
+        assertTrue(isSameTable(loaded, table), "Table we modified must be the same as the one loaded");
+    }
+
+    @Test
+    @Order(25)
+    public void addTinyIntegerColumn() throws SqlModellerException {
+        var level = new TestIntegerColumn(table, "level", JDBCType.TINYINT);
+        table.addColumn(level);
+        modeller.addColumn(level);
+        var loaded = modeller.readTable(db, "Person");
+        assertTrue(isSameTable(loaded, table), "Table we modified must be the same as the one loaded");
+    }
+
+    @Test
     @Order(22)
     public void addBitColumn() throws SqlModellerException {
         var bits = new TestBitColumn(table, "bits", 8);
