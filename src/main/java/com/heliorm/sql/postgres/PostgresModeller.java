@@ -312,12 +312,22 @@ public final class PostgresModeller extends SqlModeller {
             var query = new StringJoiner(";");
             query.add(format("ALTER TYPE \"%s\" RENAME TO \"%s_old\"", typeName(column), typeName(column)));
             query.add(makeAddEnumTypeQuery(column));
+            // the default is bound to the old type, so it must go before the type changes and be re-applied after
+            query.add(format("ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT",
+                    getTableName(column.table()),
+                    getColumnName(column)));
             query.add(format("ALTER TABLE %s ALTER COLUMN %s TYPE \"%s\" USING %s::text::\"%s\"",
                     getTableName(column.table()),
                     getColumnName(column),
                     typeName(column),
                     getColumnName(column),
                     typeName(column)));
+            if (column.defaultValue() != null) {
+                query.add(format("ALTER TABLE %s ALTER COLUMN %s SET DEFAULT '%s'",
+                        getTableName(column.table()),
+                        getColumnName(column),
+                        column.defaultValue()));
+            }
             query.add(format("DROP TYPE \"%s_old\"", typeName(column)));
             try (var con = con(); var stmt = con.createStatement()) {
                 stmt.executeUpdate(query.toString());

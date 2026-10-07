@@ -115,6 +115,36 @@ public final class TestCRUD extends AbstractSqlTest {
     }
 
     @Test
+    @Order(55)
+    public void addEnumColumnWithDefault() throws SqlModellerException {
+        var mood = new TestEnumColumn(table, "mood", false, "OK", new HashSet<>(Arrays.asList("OK", "BAD")));
+        table.addColumn(mood);
+        modeller.addColumn(mood);
+        var loaded = modeller.readTable(db, "Person");
+        assertTrue(isSameTable(loaded, table), "Table we modified must be the same as the one loaded");
+    }
+
+    @Test
+    @Order(56)
+    public void addEnumValueWithDefault() throws SqlModellerException {
+        var mood = new TestEnumColumn(table, "mood", false, "OK", new HashSet<>(Arrays.asList("OK", "BAD", "GREAT")));
+        table.addColumn(mood);
+        modeller.modifyColumn(mood);
+        var loaded = modeller.readTable(db, "Person");
+        assertTrue(isSameTable(loaded, table), "Table we modified must be the same as the one loaded");
+    }
+
+    @Test
+    @Order(57)
+    public void removeEnumValueWithDefault() throws SqlModellerException {
+        var mood = new TestEnumColumn(table, "mood", false, "OK", new HashSet<>(Arrays.asList("OK", "GREAT")));
+        table.addColumn(mood);
+        modeller.modifyColumn(mood);
+        var loaded = modeller.readTable(db, "Person");
+        assertTrue(isSameTable(loaded, table), "Table we modified must be the same as the one loaded");
+    }
+
+    @Test
     @Order(60)
     public void removeEnumValue() throws SqlModellerException {
         var type = new TestEnumColumn(table, "type", true, new HashSet<>(Arrays.asList("APE", "COW")));

@@ -12,6 +12,11 @@ public final class TestEnumColumn extends TestColumn implements EnumColumn {
         this.enumValues = enumValues;
     }
 
+    public TestEnumColumn(Table table, String name, boolean nullable, String defaultValue, Set<String> enumValues) {
+        super(table, name, JDBCType.OTHER, nullable, defaultValue, false, false, enumValues);
+        this.enumValues = enumValues;
+    }
+
 
     @Override
     public Set<String> enumValues() {
