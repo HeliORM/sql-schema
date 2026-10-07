@@ -142,7 +142,7 @@ public abstract class SqlModeller {
     public final boolean tableExists(Table table) throws SqlModellerException {
         try (var con = con()) {
             var dbm = con.getMetaData();
-            try (var tables = dbm.getTables(getDatabaseName(table.getDatabase()), null, table.getName(), null)) {
+            try (var tables = dbm.getTables(table.getDatabase().name(), null, table.getName(), null)) {
                 return tables.next();
             }
         } catch (SQLException ex) {

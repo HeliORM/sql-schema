@@ -145,6 +145,9 @@ public final class PostgresModeller extends SqlModeller {
                 getColumnName(column), createBasicType(column),
                 getColumnName(column),
                 typeName(column)));
+        if (column.defaultValue() != null) {
+            sql.append(format(",ALTER %s SET DEFAULT '%s'", getColumnName(column), column.defaultValue()));
+        }
         if (!column.nullable()) {
             sql.append(format(",ALTER %s SET NOT NULL", getColumnName(column)));
         } else {
@@ -265,6 +268,10 @@ public final class PostgresModeller extends SqlModeller {
 
     @Override
     protected String extractDefault(String text) {
+        if (text.startsWith("nextval(")) {
+            // default of a serial column, this is the auto-increment sequence and not a real default
+            return null;
+        }
         int idx = text.indexOf("::");
         if (idx > 0) {
             return text.substring(0, idx).replace("'", "");
@@ -303,14 +310,15 @@ public final class PostgresModeller extends SqlModeller {
         var have = readEnumValues(column);
         if (!want.equals(have)) {
             var query = new StringJoiner(";");
-            query.add(format("ALTER TYPE %s RENAME TO %s_old", typeName(column), typeName(column)));
+            query.add(format("ALTER TYPE \"%s\" RENAME TO \"%s_old\"", typeName(column), typeName(column)));
             query.add(makeAddEnumTypeQuery(column));
-            query.add(format("ALTER TABLE %s COLUMN %s TYPE %s USING %s::text::%s",
+            query.add(format("ALTER TABLE %s ALTER COLUMN %s TYPE \"%s\" USING %s::text::\"%s\"",
                     getTableName(column.table()),
                     getColumnName(column),
                     typeName(column),
                     getColumnName(column),
                     typeName(column)));
+            query.add(format("DROP TYPE \"%s_old\"", typeName(column)));
             try (var con = con(); var stmt = con.createStatement()) {
                 stmt.executeUpdate(query.toString());
             } catch (SQLException e) {
@@ -370,6 +378,7 @@ public final class PostgresModeller extends SqlModeller {
                         throw new SqlModellerException(format("Unexpected JDBC type %s in decimal column", column.jdbcType()));
             };
             case BinaryColumn ignored -> typeName = "BYTEA";
+            case BitColumn bitColumn -> typeName = format("BIT(%d)", bitColumn.bits());
             default -> {
                 switch (column.jdbcType()) {
                     case TINYINT -> {
