@@ -5,6 +5,7 @@ import com.heliorm.sql.BitColumn;
 import com.heliorm.sql.BooleanColumn;
 import com.heliorm.sql.Column;
 import com.heliorm.sql.Database;
+import com.heliorm.sql.DateColumn;
 import com.heliorm.sql.DateTimeColumn;
 import com.heliorm.sql.DecimalColumn;
 import com.heliorm.sql.DoubleColumn;
@@ -145,6 +146,7 @@ public final class MysqlModeller extends SqlModeller {
                     typeName = "TINYBLOB";
                 }
             }
+            case DateColumn ignored -> typeName = "DATE";
             case DateTimeColumn ignored -> typeName = "DATETIME";
             case TimeStampColumn ignored -> typeName = "TIMESTAMP";
             case DoubleColumn ignored -> typeName = "DOUBLE";
@@ -319,6 +321,10 @@ public final class MysqlModeller extends SqlModeller {
                         && ((DecimalColumn) one).scale() == ((DecimalColumn) other).scale();
             }
             return false;
+        } else if (one instanceof DateColumn) {
+            if (other instanceof DateColumn) {
+                return true;
+            }
         } else if (one instanceof DateTimeColumn) {
             if (other instanceof DateTimeColumn) {
                 return true;

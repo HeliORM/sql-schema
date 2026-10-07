@@ -646,6 +646,9 @@ public abstract class SqlModeller {
             } else if (isBinaryColumn(jdbcType)) {
                 return new SqlBinaryColumn(table, columnName, jdbcType, nullable, defVal, size);
             }
+            if (jdbcType == JDBCType.DATE) {
+                return new SqlDateColumn(table, columnName, nullable, defVal);
+            }
             if (isDateTimeColumn(jdbcType)) {
                 if (typeName.equals("DATETIME")) {
                     return new SqlDateTimeColumn(table, columnName, jdbcType, nullable, defVal);

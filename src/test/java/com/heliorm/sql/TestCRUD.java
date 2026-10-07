@@ -45,6 +45,16 @@ public final class TestCRUD extends AbstractSqlTest {
 
 
     @Test
+    @Order(23)
+    public void addDateColumn() throws SqlModellerException {
+        var born = new TestDateColumn(table, "born", true);
+        table.addColumn(born);
+        modeller.addColumn(born);
+        var loaded = modeller.readTable(db, "Person");
+        assertTrue(isSameTable(loaded, table), "Table we modified must be the same as the one loaded");
+    }
+
+    @Test
     @Order(22)
     public void addBitColumn() throws SqlModellerException {
         var bits = new TestBitColumn(table, "bits", 8);
